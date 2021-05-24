@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "lhjdemo"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"Azure_SQL_dbtest_connectionString": {
+			"value": ""
+		}
+	}
+}
