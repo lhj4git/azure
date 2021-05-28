@@ -22,6 +22,10 @@
 		"Linked_Service_to_SQL_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Linked_Service_to_SQL'"
+		},
+		"RestService1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://data.nj.gov/resource/pruu-wapw.json"
 		}
 	},
 	"variables": {
@@ -76,6 +80,21 @@
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": "[parameters('Linked_Service_to_SQL_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestService1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('RestService1_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
 				}
 			},
 			"dependsOn": []
@@ -277,6 +296,78 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "cust_address"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linked_Service_to_SQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/API_to_Sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "RestService1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/RestService1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/njo_gov')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linked_Service_to_SQL",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Year",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "cause_of_death",
+						"type": "varchar"
+					},
+					{
+						"name": "number_of_death",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "age_adjusted_death_rate_per_100_000_population",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "lower_95_confidence_limit",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "upper_95_confidence_limit",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "njo_gov_data"
 				}
 			},
 			"dependsOn": [
@@ -638,6 +729,118 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/customer_address')]",
 				"[concat(variables('factoryId'), '/datasets/Azure_Sql_Destination')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/api_to_sql')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ETL_API_TO_SQL",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET"
+							},
+							"sink": {
+								"type": "AzureSqlSink"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['year']"
+										},
+										"sink": {
+											"name": "Year",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"path": "$['cause_of_death']"
+										},
+										"sink": {
+											"name": "cause_of_death",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['number_of_deaths']"
+										},
+										"sink": {
+											"name": "number_of_death",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"path": "$['age_adjusted_death_rate_per_100_000_population']"
+										},
+										"sink": {
+											"name": "age_adjusted_death_rate_per_100_000_population",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lower_95_confidence_limit']"
+										},
+										"sink": {
+											"name": "lower_95_confidence_limit",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"path": "$['upper_95_confidence_limit']"
+										},
+										"sink": {
+											"name": "upper_95_confidence_limit",
+											"type": "Decimal"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "API_to_Sql",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "njo_gov",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/API_to_Sql')]",
+				"[concat(variables('factoryId'), '/datasets/njo_gov')]"
 			]
 		}
 	]

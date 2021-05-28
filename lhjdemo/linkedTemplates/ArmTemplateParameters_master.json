@@ -17,6 +17,9 @@
 		"Linked_Service_to_SQL_connectionString": {
 			"value": ""
 		},
+		"RestService1_properties_typeProperties_url": {
+			"value": "https://data.nj.gov/resource/pruu-wapw.json"
+		},
 		"containerUri": {
 			"value": ""
 		},
