@@ -585,7 +585,7 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "truncate table dbo.customer_address; ",
+								"preCopyScript": "truncate table dbo.cust_address; ",
 								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
