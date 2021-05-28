@@ -18,6 +18,15 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "rowguid",
+				"type": "String"
+			},
+			{
+				"name": "Name ",
+				"type": "String"
+			}
+		]
 	}
 }
