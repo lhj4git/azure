@@ -11,6 +11,12 @@
 		"Azure_SQL_dbtest_connectionString": {
 			"value": ""
 		},
+		"Linked_Service_to_BS_connectionString": {
+			"value": ""
+		},
+		"Linked_Service_to_SQL_connectionString": {
+			"value": ""
+		},
 		"containerUri": {
 			"value": ""
 		},

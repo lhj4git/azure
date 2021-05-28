@@ -15,6 +15,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Azure_SQL_dbtest'"
 		},
+		"Linked_Service_to_BS_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Linked_Service_to_BS'"
+		},
+		"Linked_Service_to_SQL_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Linked_Service_to_SQL'"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -47,6 +55,12 @@
 					},
 					"Azure_SQL_dbtest_connectionString": {
 						"value": "[parameters('Azure_SQL_dbtest_connectionString')]"
+					},
+					"Linked_Service_to_BS_connectionString": {
+						"value": "[parameters('Linked_Service_to_BS_connectionString')]"
+					},
+					"Linked_Service_to_SQL_connectionString": {
+						"value": "[parameters('Linked_Service_to_SQL_connectionString')]"
 					}
 				}
 			},
