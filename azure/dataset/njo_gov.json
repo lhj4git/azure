@@ -1,0 +1,49 @@
+{
+	"name": "njo_gov",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Linked_Service_to_SQL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Year",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "cause_of_death",
+				"type": "varchar"
+			},
+			{
+				"name": "number_of_death",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "age_adjusted_death_rate_per_100_000_population",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			},
+			{
+				"name": "lower_95_confidence_limit",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			},
+			{
+				"name": "upper_95_confidence_limit",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "njo_gov_data"
+		}
+	}
+}

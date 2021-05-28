@@ -15,8 +15,88 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"enableStaging": false
-				}
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET"
+					},
+					"sink": {
+						"type": "AzureSqlSink"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['year']"
+								},
+								"sink": {
+									"name": "Year",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "$['cause_of_death']"
+								},
+								"sink": {
+									"name": "cause_of_death",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['number_of_deaths']"
+								},
+								"sink": {
+									"name": "number_of_death",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"path": "$['age_adjusted_death_rate_per_100_000_population']"
+								},
+								"sink": {
+									"name": "age_adjusted_death_rate_per_100_000_population",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lower_95_confidence_limit']"
+								},
+								"sink": {
+									"name": "lower_95_confidence_limit",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"path": "$['upper_95_confidence_limit']"
+								},
+								"sink": {
+									"name": "upper_95_confidence_limit",
+									"type": "Decimal"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "API_to_Sql",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "njo_gov",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"annotations": []
