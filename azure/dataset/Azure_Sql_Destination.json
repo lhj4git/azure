@@ -1,0 +1,16 @@
+{
+	"name": "Azure_Sql_Destination",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Linked_Service_to_SQL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "cust_address"
+		}
+	}
+}
