@@ -1,5 +1,5 @@
 {
-	"name": "dataflow1",
+	"name": "test_data_flow",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -23,9 +23,15 @@
 			"transformations": [
 				{
 					"name": "Join1"
+				},
+				{
+					"name": "Join2"
+				},
+				{
+					"name": "Filter1"
 				}
 			],
-			"script": "source(output(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as string,\n\t\tColumn_9 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tlimit: 100) ~> custadr\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> custnames\ncustadr, custnames join(Column_1 == ERROR_FUNCTION(''),\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1"
+			"script": "source(output(\n\t\tAddressID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as integer '000',\n\t\trowguid as string,\n\t\tModifiedDate as timestamp 'MM/dd/yyyy hh:mm:ss a'\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false,\n\tlimit: 100) ~> custadr\nsource(output(\n\t\trowguid as string,\n\t\t{Name } as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: true,\n\tignoreNoFilesFound: false) ~> custnames\ncustadr, custnames join(Column_1 == ERROR_FUNCTION(''),\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\ncustnames, custadr join(custnames@rowguid == custadr@rowguid,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join2\nJoin2 filter(City == 'Bothell') ~> Filter1"
 		}
 	}
 }
