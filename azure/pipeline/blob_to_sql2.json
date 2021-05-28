@@ -38,8 +38,9 @@
 						"mappings": [
 							{
 								"source": {
+									"name": "AddressID",
 									"type": "String",
-									"ordinal": 1
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "AddressID",
@@ -49,8 +50,9 @@
 							},
 							{
 								"source": {
+									"name": "AddressLine1",
 									"type": "String",
-									"ordinal": 2
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "AddressLine1",
@@ -60,8 +62,9 @@
 							},
 							{
 								"source": {
+									"name": "AddressLine2",
 									"type": "String",
-									"ordinal": 3
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "AddressLine2",
@@ -71,8 +74,9 @@
 							},
 							{
 								"source": {
+									"name": "City",
 									"type": "String",
-									"ordinal": 4
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "City",
@@ -82,8 +86,9 @@
 							},
 							{
 								"source": {
+									"name": "StateProvince",
 									"type": "String",
-									"ordinal": 5
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "StateProvince",
@@ -93,8 +98,9 @@
 							},
 							{
 								"source": {
+									"name": "CountryRegion",
 									"type": "String",
-									"ordinal": 6
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "CountryRegion",
@@ -104,8 +110,9 @@
 							},
 							{
 								"source": {
+									"name": "PostalCode",
 									"type": "String",
-									"ordinal": 7
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "PostalCode",
@@ -115,8 +122,9 @@
 							},
 							{
 								"source": {
+									"name": "rowguid",
 									"type": "String",
-									"ordinal": 8
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "rowguid",
@@ -126,8 +134,9 @@
 							},
 							{
 								"source": {
+									"name": "ModifiedDate",
 									"type": "String",
-									"ordinal": 9
+									"physicalType": "String"
 								},
 								"sink": {
 									"name": "ModifiedDate",
