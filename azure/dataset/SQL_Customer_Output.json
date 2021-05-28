@@ -43,7 +43,7 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "Customer_output"
+			"table": "Customer_Output"
 		}
 	}
 }
