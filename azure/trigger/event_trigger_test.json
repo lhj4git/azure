@@ -1,0 +1,25 @@
+{
+	"name": "event_trigger_test",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "blob_to_sql2",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/inputdata/blobs/",
+			"blobPathEndsWith": "/customer_address.csv",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/c7504490-7055-47f9-85f1-135797a0aff6/resourceGroups/cloud-shell-storage-westeurope/providers/Microsoft.Storage/storageAccounts/lhjdemo",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}
