@@ -33,6 +33,193 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Data_flow')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "test_data_flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "test_data_flow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"custadr": {},
+									"custnames": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "test_data_flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "test_data_flow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"custadr": {},
+									"custnames": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/test_data_flow')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/api_to_sql')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ETL_API_TO_SQL",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET"
+							},
+							"sink": {
+								"type": "AzureSqlSink"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['year']"
+										},
+										"sink": {
+											"name": "Year",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"path": "$['cause_of_death']"
+										},
+										"sink": {
+											"name": "cause_of_death",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['number_of_deaths']"
+										},
+										"sink": {
+											"name": "number_of_death",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"path": "$['age_adjusted_death_rate_per_100_000_population']"
+										},
+										"sink": {
+											"name": "age_adjusted_death_rate_per_100_000_population",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lower_95_confidence_limit']"
+										},
+										"sink": {
+											"name": "lower_95_confidence_limit",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"path": "$['upper_95_confidence_limit']"
+										},
+										"sink": {
+											"name": "upper_95_confidence_limit",
+											"type": "Decimal"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "API_to_Sql",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "njo_gov",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/API_to_Sql')]",
+				"[concat(variables('factoryId'), '/datasets/njo_gov')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/blob_to_sql')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -209,158 +396,6 @@
 				"[concat(variables('factoryId'), '/datasets/cust_adr')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Azure_SQL_dbtest",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "AddressID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "AddressLine1",
-						"type": "nvarchar"
-					},
-					{
-						"name": "AddressLine2",
-						"type": "nvarchar"
-					},
-					{
-						"name": "City",
-						"type": "nvarchar"
-					},
-					{
-						"name": "StateProvince",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CountryRegion",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PostalCode",
-						"type": "nvarchar"
-					},
-					{
-						"name": "rowguid",
-						"type": "uniqueidentifier"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Address"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Azure_SQL_dbtest')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/cust_adr')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "custadr.csv",
-						"container": "inputdata"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "AddressID",
-						"type": "String"
-					},
-					{
-						"name": "AddressLine1",
-						"type": "String"
-					},
-					{
-						"name": "AddressLine2",
-						"type": "String"
-					},
-					{
-						"name": "City",
-						"type": "String"
-					},
-					{
-						"name": "StateProvince",
-						"type": "String"
-					},
-					{
-						"name": "CountryRegion",
-						"type": "String"
-					},
-					{
-						"name": "PostalCode",
-						"type": "String"
-					},
-					{
-						"name": "rowguid",
-						"type": "String"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Azure_SQL_dbtest')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('Azure_SQL_dbtest_connectionString')]"
-				}
-			},
-			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/blob_to_sql2')]",
@@ -542,17 +577,517 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Linked_Service_to_BS')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/blob_to_sql3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "AddressID",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AddressID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "AddressLine1",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AddressLine1",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AddressLine2",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AddressLine2",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "City",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "City",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "StateProvince",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "StateProvince",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CountryRegion",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CountryRegion",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PostalCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PostalCode",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "rowguid",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "rowguid",
+											"type": "Guid",
+											"physicalType": "uniqueidentifier"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "ModifiedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "address_data",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "AzureSqlTable3",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/address_data')]",
+				"[concat(variables('factoryId'), '/datasets/AzureSqlTable3')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/API_to_Sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "RestService1",
+					"type": "LinkedServiceReference"
+				},
 				"annotations": [],
-				"type": "AzureBlobStorage",
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/RestService1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Azure_SQL_dbtest",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StateProvince",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
 				"typeProperties": {
-					"connectionString": "[parameters('Linked_Service_to_BS_connectionString')]"
+					"schema": "dbo",
+					"table": "Address"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Azure_SQL_dbtest')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Azure_SQL_dbtest",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StateProvince",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Customer_Address2"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Azure_SQL_dbtest')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Azure_Sql_Destination')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linked_Service_to_SQL",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "cust_address"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linked_Service_to_SQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQL_Customer_Output')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linked_Service_to_SQL",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "Name",
+						"type": "varchar"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StateProvince",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Customer_Output"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linked_Service_to_SQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/address_data')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linked_Service_to_BS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "customer_address.csv",
+						"container": "inputdata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linked_Service_to_BS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/cust_adr')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "custadr.csv",
+						"container": "inputdata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "StateProvince",
+						"type": "String"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "String"
+					},
+					{
+						"name": "PostalCode",
+						"type": "String"
+					},
+					{
+						"name": "rowguid",
+						"type": "String"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/customer_address')]",
@@ -620,183 +1155,41 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Linked_Service_to_SQL')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('Linked_Service_to_SQL_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Azure_Sql_Destination')]",
+			"name": "[concat(parameters('factoryName'), '/customer_name')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "Linked_Service_to_SQL",
+					"referenceName": "Linked_Service_to_BS",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
+				"type": "DelimitedText",
 				"typeProperties": {
-					"schema": "dbo",
-					"table": "cust_address"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Linked_Service_to_SQL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/api_to_sql')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "customer_name.csv",
+						"container": "inputdata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
 					{
-						"name": "ETL_API_TO_SQL",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "GET"
-							},
-							"sink": {
-								"type": "AzureSqlSink"
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"path": "$['year']"
-										},
-										"sink": {
-											"name": "Year",
-											"type": "Int32"
-										}
-									},
-									{
-										"source": {
-											"path": "$['cause_of_death']"
-										},
-										"sink": {
-											"name": "cause_of_death",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "$['number_of_deaths']"
-										},
-										"sink": {
-											"name": "number_of_death",
-											"type": "Int32"
-										}
-									},
-									{
-										"source": {
-											"path": "$['age_adjusted_death_rate_per_100_000_population']"
-										},
-										"sink": {
-											"name": "age_adjusted_death_rate_per_100_000_population",
-											"type": "Decimal"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lower_95_confidence_limit']"
-										},
-										"sink": {
-											"name": "lower_95_confidence_limit",
-											"type": "Decimal"
-										}
-									},
-									{
-										"source": {
-											"path": "$['upper_95_confidence_limit']"
-										},
-										"sink": {
-											"name": "upper_95_confidence_limit",
-											"type": "Decimal"
-										}
-									}
-								]
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "API_to_Sql",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "njo_gov",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+						"name": "rowguid",
+						"type": "String"
+					},
+					{
+						"name": "Name ",
+						"type": "String"
 					}
-				],
-				"annotations": []
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/API_to_Sql')]",
-				"[concat(variables('factoryId'), '/datasets/njo_gov')]"
+				"[concat(variables('factoryId'), '/linkedServices/Linked_Service_to_BS')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/API_to_Sql')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "RestService1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/RestService1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RestService1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('RestService1_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "Anonymous"
-				}
-			},
-			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/njo_gov')]",
@@ -853,79 +1246,71 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Data_flow')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "test_data_flow",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "1.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "test_data_flow",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"custadr": {},
-									"custnames": {},
-									"sink1": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					},
-					{
-						"name": "test_data_flow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "1.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "test_data_flow",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"custadr": {},
-									"custnames": {},
-									"sink1": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"annotations": []
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/test_data_flow')]"
-			]
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Azure_SQL_dbtest')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('Azure_SQL_dbtest_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Linked_Service_to_BS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('Linked_Service_to_BS_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Linked_Service_to_SQL')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('Linked_Service_to_SQL_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestService1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('RestService1_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/test_data_flow')]",
@@ -977,97 +1362,6 @@
 				"[concat(variables('factoryId'), '/datasets/customer_address')]",
 				"[concat(variables('factoryId'), '/datasets/customer_name')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_Customer_Output')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/customer_name')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Linked_Service_to_BS",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "customer_name.csv",
-						"container": "inputdata"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "rowguid",
-						"type": "String"
-					},
-					{
-						"name": "Name ",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Linked_Service_to_BS')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SQL_Customer_Output')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Linked_Service_to_SQL",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "rowguid",
-						"type": "uniqueidentifier"
-					},
-					{
-						"name": "Name",
-						"type": "varchar"
-					},
-					{
-						"name": "AddressLine1",
-						"type": "nvarchar"
-					},
-					{
-						"name": "AddressLine2",
-						"type": "nvarchar"
-					},
-					{
-						"name": "City",
-						"type": "nvarchar"
-					},
-					{
-						"name": "StateProvince",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CountryRegion",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PostalCode",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Customer_Output"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Linked_Service_to_SQL')]"
 			]
 		}
 	]
